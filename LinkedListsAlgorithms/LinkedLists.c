@@ -118,5 +118,5 @@ void deleteDataRec(Node** head, int data){
 void printLRec(Node* head){
     if(head == NULL) return;
     printf("%d",head->data);
-    printLRec(head-next);
+    printLRec(head->next);
 }
