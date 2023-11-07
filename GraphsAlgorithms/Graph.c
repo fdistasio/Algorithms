@@ -79,8 +79,8 @@ Graph load(char* file){
 		}
 		return g;
 
-	} 
-  else{
+	}
+	else{
 		perror("Open file: ");
 		exit(1);
 	}
@@ -104,7 +104,8 @@ void save(Graph g, char* file){
 			}
 		}
 		fclose(out);	
-	}else{
+	}
+	else{
 		perror("Open file: ");
 		exit(1);
 	}
