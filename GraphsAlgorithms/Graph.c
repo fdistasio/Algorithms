@@ -19,6 +19,11 @@ typedef struct {
 	Node* nodes;
 } Graph;
 
+typedef struct {
+	int n1, n2;
+	float w;
+} CompleteEdge;
+
 typedef struct n{
 	int index;
 	struct n * next;
@@ -58,7 +63,6 @@ void insert(Edge** adjList,int dest,float weight){
 //O(N)
 Graph load(char* file){
 	FILE* in = fopen(file,"r");
-
 	if(in){
 		Graph g;
 
@@ -89,7 +93,6 @@ Graph load(char* file){
 //O(N+E)
 void save(Graph g, char* file){
 	FILE* out = fopen(file,"w");
-
 	if(out){
 		fprintf(out,"%d\n",g.N);
 		for(int i=0;i<g.N;i++){
@@ -105,7 +108,7 @@ void save(Graph g, char* file){
 		}
 		fclose(out);	
 	}
-	else{
+    else{
 		perror("Open file: ");
 		exit(1);
 	}
@@ -187,4 +190,83 @@ int isTree(Graph g){
 	int* temp=dfs(g,0,&cycles,&ncc);
 	free(temp);
 	return (ncc==1 && !cycles);
+}
+
+//O(1)
+void insertEdge(Graph g, CompleteEdge e){
+	insert(&(g.nodes[e.n1].adjList), e.n2,e.w);
+	insert(&(g.nodes[e.n2].adjList), e.n1,e.w);
+}
+
+//O(E)
+void _remove(Edge** adjList, int n){
+	if((*adjList)!=NULL){
+		if((*adjList)->dest==n){
+			Edge* temp=(*adjList);
+			(*adjList)=temp->next;
+			free(temp);
+		} 
+		else{
+			_remove(&((*adjList)->next),n);
+		}
+	}
+}
+
+//O(E)
+void removeEdge(Graph g, CompleteEdge e){
+	_remove(&(g.nodes[e.n1].adjList),e.n2);
+	_remove(&(g.nodes[e.n2].adjList),e.n1);	
+}
+
+//O(1)
+int compareEdge(const void* e1,const void* e2){
+	return (int)((CompleteEdge*)e1)->w-((CompleteEdge*)e2)->w;
+}
+
+//O(ElogE)
+Graph Kruskal(Graph g){
+	Graph tree;
+	tree.N=g.N;
+	tree.E=0;
+	tree.nodes=(Node*)malloc(g.N*sizeof(Node));
+	if(tree.nodes==NULL){
+		printf("Memory error");
+		exit(1);
+	}
+
+	for(int i=0;i<tree.N;i++){
+		tree.nodes[i].val=g.nodes[i].val;
+		tree.nodes[i].adjList=NULL;
+	}
+
+	CompleteEdge edges[g.E];
+	int dim=0;
+	
+	for(int i=0;i<g.N;i++){
+		Edge* al=g.nodes[i].adjList;
+		while(al!=NULL){
+			if(i<al->dest){
+				CompleteEdge e;
+				e.n1=i;
+				e.n2=al->dest;
+				e.w=al->w;
+				edges[dim]=e;
+				dim++;
+			}
+			al=al->next;
+		}
+	}
+	qsort(edges,g.E,sizeof(CompleteEdge),compareEdge);
+
+	int e=0;
+	while(tree.E<tree.N-1){
+		insertEdge(tree,edges[e]);
+		if (hasCycles(tree)){
+			removeEdge(tree,edges[e]);
+		} else {
+			tree.E++;
+		}
+		e++;
+	}
+	return tree;	
 }
