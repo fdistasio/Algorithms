@@ -62,6 +62,6 @@ printL:
 	b loop
 
  endprint:
-	pop {r4,pc}           @ return
+	pop {r4,pc}          	@ return
 .data
 s: .string "%d "
