@@ -48,7 +48,7 @@ Graph dfs(Graph, int, int*, int*);
 // 'nConComp', inizializzato con qualunque valore, ritorna il numero di componenti connesse del grafo 'g'.
 // Se ad 'hasCycles' o 'nConComp' viene passato NULL, non viene effettuato il relativo controllo e restano a NULL.
 // Ritorna il grafo rappresentante l'ordine di visita dei nodi, dove un arco rappresenta il collegamento
-// col padre in ordine di visita. Pu� essere non connesso, cioè una foresta di alberi di visita dfs.
+// col padre in ordine di visita. Puo' essere non connesso, cioè una foresta di alberi di visita dfs.
 Graph dfs_rec(Graph , int , int* , int* );
 
 // Visita bfs iterativa, usando una lista concatenata a doppi puntatori come coda, del grafo 'g' a partire dal vertice 'start'
