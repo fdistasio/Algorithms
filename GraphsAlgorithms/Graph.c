@@ -122,6 +122,49 @@ void visit(int n,int p,int* visited, int* result, int* visitedN){
 }
 
 //O(N+E)
+Graph bfs(Graph g, int start, int* nConComp){
+	Graph result_forest = create_graph(g.N);
+	int parent[g.N]; 
+	int visitedN=0;
+	
+	for(int i=0;i<g.N;i++)
+		if(i==start)
+			parent[i]=i;
+		else
+			parent[i]=-1;
+	
+	Queue q;
+	initQueue(&q);
+	enqueue(&q,start);
+	visitedN = visit(NULL, &result_forest, parent, visitedN);
+	
+	if(nConComp) 
+		*nConComp=1;
+	
+	while(!isEmpty(q)){
+		int v=dequeue(&q);
+		Edge* e=g.nodes[v].adjList;
+		while(e!=NULL){
+			if(parent[e->dest]==-1){
+				visitedN = visit(e,&result_forest,parent,visitedN);
+				enqueue(&q,e->dest);
+			}
+			e=e->next;
+		}
+		if(isEmpty(q) && visitedN<g.N){
+			int i=0;
+			while(parent[i]!=-1)
+				i++;
+			visitedN = visit(NULL,&result_forest,parent,visitedN);
+			enqueue(&q,i);
+			if(nConComp) 
+				(*nConComp)++;
+		}
+	}
+	return result_forest;
+}
+
+//O(N+E)
 int* dfs(Graph g, int start, int* hasCycles, int* nConComp){
 	int prev[g.N];
 	
@@ -269,4 +312,68 @@ Graph Kruskal(Graph g){
 		e++;
 	}
 	return tree;	
+}
+
+//O(N+ElogN)
+Graph Dijkstra(Graph g, int source, int orientato){
+	Graph result_ssp = create_graph(g.N);
+
+	int Q[g.N];
+	int num_q_element = 1;
+	int parent[g.N];
+	float path_w[g.N];
+	float w[g.N];
+	for(int i=0;i<result_ssp.N;i++){
+		if(i==source){
+			parent[source] = source;
+			Q[source] = 1;
+			path_w[source] = 0;
+		}
+		else{
+			path_w[i] = FLT_MAX;
+			parent[i] = -1;
+			Q[i] = 0;
+		}
+	}
+
+	while(num_q_element>0){
+		int minimo_v = -1;
+		float min_path_w = FLT_MAX;
+
+		for (int i = 0; i < g.N; i++)
+			if (Q[i] && (path_w[i] < min_path_w)){
+				minimo_v = i;
+				min_path_w = path_w[i];
+			}
+
+		Q[minimo_v] = 0;
+		num_q_element--;
+
+		if(parent[minimo_v]!=minimo_v){
+			insert(&result_ssp, minimo_v, parent[minimo_v], w[minimo_v]);
+			if(!orientato)
+				insert(&result_ssp, parent[minimo_v], minimo_v, w[minimo_v]);
+		}
+		
+		Edge* e=g.nodes[minimo_v].adjList;
+
+		while(e!=NULL){
+			int v_dest = e->dest;
+			int new_path_w = path_w[minimo_v] + e->w;
+			if (path_w[v_dest] > new_path_w)
+			{
+				parent[v_dest] = minimo_v;
+				path_w[v_dest] = new_path_w;
+				w[v_dest] =  e->w;
+
+				if(Q[v_dest] == 0)
+				{
+					Q[v_dest] = 1;
+					num_q_element++;
+				}
+			}
+			e=e->next;
+		}
+	}
+	return result_ssp;
 }
