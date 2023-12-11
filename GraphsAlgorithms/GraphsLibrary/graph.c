@@ -126,6 +126,7 @@ void delete (Graph* g, int source, int dest)
 					prec->next = attuale->next;
 				free(attuale);
 				g->E--;
+				break;
 			}
 			else
 			{
