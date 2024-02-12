@@ -1,4 +1,4 @@
-//Preorder Visit O(n), Inorder Visit O(n), Postorder Visit (n)
+//Binary Tree Visits
 #include <stdlib.h>
 
 typedef struct n{
@@ -7,6 +7,7 @@ typedef struct n{
     struct n * l;
 }node;
 
+//O(n)
 void binaryTreePreorderVisit(node* root){
     if(root != NULL){
         printf("%d ",root->data);
@@ -15,6 +16,7 @@ void binaryTreePreorderVisit(node* root){
     }
 }
 
+//O(n)
 void binaryTreeInorderVisit(node* root){
     if(root != NULL){
         binaryTreeInorderVisit(root->l);
@@ -23,6 +25,7 @@ void binaryTreeInorderVisit(node* root){
     }
 }
 
+//O(n)
 void binaryTreePostorderVisit(node* root){
     if(root != NULL){
         binaryTreePostorderVisit(root->l);
