@@ -135,7 +135,6 @@ void writer(sem_t *sem_mutex, sem_t *sem_empty, sem_t *sem_full, SharedData *sha
         printf("Writer - Wrote: %c\n", data);
 
         // Incrementa il carattere da scrivere (esempio: A, B, C, ...)
-        //data = (data + 1) > 'Z' ? 'A' : (data + 1);
         if(data == 'Z') exit(EXIT_SUCCESS);
         data = data + 1;
 
