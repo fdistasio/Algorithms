@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
     int argument = 1;
     void * retValue;   
 
-    // Creazione primo Thread
+    // Creazione Thread
     SYST(pthread_create(&tid1, NULL, thread_fun, &argument));
 
     // Allocazione memoria per il valore di ritorno
