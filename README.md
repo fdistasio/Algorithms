@@ -40,5 +40,5 @@ Set of algorithms and data structures, and more generic algorithms for recurring
 ## Threads
 
 - [Thread Create](Threads/threadCreate.c)
-- [Thread Mutex](Threads/threadCreateMutex.c)
+- [Thread Mutex](Threads/threadsCreateMutex.c)
 - [Error Handling macros](Threads/macros.h)
