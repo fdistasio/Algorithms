@@ -12,52 +12,55 @@
 int main() {
     int retvalue, pipe_fd[2];
 
-    // Creazione della pipe
-    SYSC(retvalue, pipe(pipe_fd), "nella creazione della pipe");
+    // Create pipe
+    SYSC(retvalue, pipe(pipe_fd), "pipe error");
 
-    // Creazione di un processo figlio
+    // Create Child Process
+
     pid_t pid;
-    SYSC(pid, fork(), "nella fork");
+    SYSC(pid, fork(), "fork error");
 
     if (pid == 0) {
-        // Codice del processo figlio
 
-        // Chiusura pipe in lettura
-        SYSC(retvalue, close(pipe_fd[0]), "nella close");
+        // Child Process
 
-        // Redirezione dello stdout nel file descriptor di scrittura della pipe
-        SYSC(retvalue, dup2(pipe_fd[1], STDOUT_FILENO), "nella dup2");
+        // Close pipe file descriptor (read)
+        SYSC(retvalue, close(pipe_fd[0]), "close error");
 
-        // Chiusura del file descriptor duplicato
-        SYSC(retvalue, close(pipe_fd[1]), "nella close");
+        // stdout redirection in pipe's write file descriptor
+        SYSC(retvalue, dup2(pipe_fd[1], STDOUT_FILENO), "dup2 error");
 
-        // Esecuzione di "ls -la"
-        SYSC(retvalue, execlp("ls", "ls -la", (char *) NULL), "nella exec");
+        // Close pipe file descriptor (write)
+        SYSC(retvalue, close(pipe_fd[1]), "close error");
 
-        // Se execlp fallisce
+        // Exec "ls -la"
+        execlp("ls", "ls -la", (char *) NULL);
+
+        // Exec error
         perror("execlp");
         exit(EXIT_FAILURE);
 
     } else {
-        // Codice del processo padre
+
+        // Father Process
 
         char buffer[BUFFER_SIZE];
 
-        // Chiusura pipe in scrittura
-        SYSC(retvalue, close(pipe_fd[1]), "nella close");
+        // Close pipe file descriptor (write)
+        SYSC(retvalue, close(pipe_fd[1]), "close error");
 
-        // Lettura dei dati dalla pipe
+        // Read from pipe
         ssize_t n_read;
-        SYSC(n_read, read(pipe_fd[0], buffer, BUFFER_SIZE), "nella read");
+        SYSC(n_read, read(pipe_fd[0], buffer, BUFFER_SIZE), "read error");
 
-        // Scrittura sullo stdout dei dati ricevuti
-        SYSC(retvalue, write(STDOUT_FILENO, buffer, n_read), "nella write");
+        // Write on pipe
+        SYSC(retvalue, write(STDOUT_FILENO, buffer, n_read), "write error");
 
-        // Chiusura pipe in lettura
-        SYSC(retvalue, close(pipe_fd[0]), "nella close");
+        // Close pipe file descriptor (read)
+        SYSC(retvalue, close(pipe_fd[0]), "close error");
 
-        // Attesa della terminazione del processo figlio
-        SYSC(retvalue, waitpid(pid, NULL, 0), "nella waitpid");
+        // Wait child process
+        SYSC(retvalue, waitpid(pid, NULL, 0), "waitpid error");
     }
 
     return 0;

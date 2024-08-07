@@ -16,56 +16,59 @@ int main(int argc, char* argv[]){
     pid_t pid_ls, pid_wc;
     int pfd[2], ret_value;
 
-    // Creazione pipe
-    SYSC(ret_value, pipe(pfd), "Errore in Pipe");
+    // Create Pipe
+    SYSC(ret_value, pipe(pfd), "Pipe error");
     
-    // Creazione del processo che eseguira' "ls -l"
-    SYSC(pid_ls, fork(), "Errore in fork ls -l");
+    // Create Child Process (will exec ls -l)
+    SYSC(pid_ls, fork(), "fork error");
 
     if (pid_ls == 0) {
-        // Codice del processo figlio
+       
+       // Child Process
 
-        // Redirezione dello stdout nel file descriptor di scrittura della pipe
-        SYSC(ret_value, dup2(pfd[1], fileno(stdout)), "in dup2");
+        // stdout redirection in pipe's write file descriptor
+        SYSC(ret_value, dup2(pfd[1], fileno(stdout)), "dup2 error");
 
-        // Chiusura pipe in lettura e scrittura
-        SYSC(ret_value, close(pfd[1]), "in chiusura pipe");
-        SYSC(ret_value, close(pfd[0]), "in chiusura pipe");
+        // Close pipe file descriptors (read and write)
+        SYSC(ret_value, close(pfd[1]), "close pipe error");
+        SYSC(ret_value, close(pfd[0]), "close pipe error");
 
-        // Esecuzione "ls -l"
-        SYSC(ret_value, execlp("ls", "ls", "-l", NULL), "in exec");
+        // Exec "ls -l"
+        execlp("ls", "ls", "-l", NULL);
 
-        // Se la exec fallisce
-        perror("in exec");
+        // Exec error
+        perror("exec");
         exit(EXIT_FAILURE);
     }   
 
-    // Creazione del processo che eseguira' "wc -l"
-    SYSC(pid_wc, fork(), "Errore in fork wc -l");
+    // Create Child Process (will exec wc -l)
+    SYSC(pid_wc, fork(), "fork error");
 
     if (pid_wc == 0) {
-        // Codice del processo figlio
+       
+       // Child Process
 
-        // Redirezione dello stdin nel file descriptor di lettura della pipe
-        SYSC(ret_value, dup2(pfd[0], fileno(stdin)), "in dup2");
+        // stdin redirection in pipe's read file descriptor
+        SYSC(ret_value, dup2(pfd[0], fileno(stdin)), "dup2 error");
 
-        // Chiusura pipe in lettura e scrittura
-        SYSC(ret_value, close(pfd[0]), "in chiusura pipe");
-        SYSC(ret_value, close(pfd[1]), "in chiusura pipe");
+        // Close pipe file descriptors (read and write)
+        SYSC(ret_value, close(pfd[0]), "close pipe error");
+        SYSC(ret_value, close(pfd[1]), "close pipe error");
 
-        // Esecuzione "wc -l"
-        SYSC(ret_value, execlp("wc", "wc", "-l", NULL), "n exec");
+        // Exec "wc -l"
+        execlp("wc", "wc", "-l", NULL);
 
-        // Se la exec fallisce
-        perror("in exec");
+        // Exec error
+        perror("exec");
         exit(EXIT_FAILURE);
+
     }
 
-    // Chiusura pipe in lettura e scrittura
-    SYSC(ret_value, close(pfd[1]), "in chiusura pipe");    
-    SYSC(ret_value, close(pfd[0]), "in chiusura pipe");
+    // Close pipe file descriptors (read and write)
+    SYSC(ret_value, close(pfd[1]), "close pipe error");    
+    SYSC(ret_value, close(pfd[0]), "close pipe error");
 
-    // Attesa della terminazione dei processi figli
-    SYSC(ret_value, waitpid(pid_ls, NULL, 0), "in waitpid");
-    SYSC(ret_value, waitpid(pid_wc, NULL, 0), "in waitpid");
+    // Wait Child processes
+    SYSC(ret_value, waitpid(pid_ls, NULL, 0), "waitpid error");
+    SYSC(ret_value, waitpid(pid_wc, NULL, 0), "waitpid error");
 }

@@ -30,115 +30,129 @@ int main() {
     sem_t *sem_mutex, *sem_empty, *sem_full;
     SharedData *shared_data;
 
-    // Creazione e apertura della memoria condivisa
-    SYSC(shm_fd, shm_open(SHARED_MEM_NAME, O_CREAT | O_RDWR, 0666), "shm_open");
+    // Create shared memory segment
+    SYSC(shm_fd, shm_open(SHARED_MEM_NAME, O_CREAT | O_RDWR, 0666), "shm_open error");
+    SYSC(retvalue, ftruncate(shm_fd, sizeof(SharedData)), "ftruncate error");
 
-    // Impostazione della dimensione della memoria condivisa
-    SYSC(retvalue, ftruncate(shm_fd, sizeof(SharedData)), "nella ftruncate");
+    // Shared memory mapping
+    SYSCN(shared_data, (SharedData *)mmap(NULL, sizeof(SharedData), PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0), "mmap error");
 
-    // Mapping della memoria condivisa
-    SYSCN(shared_data, (SharedData *)mmap(NULL, sizeof(SharedData), PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0), "mmap");
-
-    // Creazione e inizializzazione dei semafori
+    // Create semaphores
     SYSCN(sem_mutex, sem_open(SEM_MUTEX_NAME, O_CREAT | O_EXCL, 0666, 1), "sem_mutex: open");
     SYSCN(sem_empty, sem_open(SEM_EMPTY_NAME, O_CREAT | O_EXCL, 0666, 0), "sem_empty: open");
     SYSCN(sem_full, sem_open(SEM_FULL_NAME, O_CREAT | O_EXCL, 0666, BUFFER_SIZE), "sem_full: open");
 
-
-    // Inizializzazione del buffer circolare
+    // Circular buffer init
     shared_data->read_index = 0;
     shared_data->write_index = 0;
 
-    // Creazione di processi lettori e scrittori (da implementare)
-    // Creazione di processi lettori e scrittori
-    SYSC(retvalue, fork(), "nella fork");
+    // Create Child process
+    SYSC(retvalue, fork(), "fork error");
+
     if (!retvalue) {
-        // Processo figlio (lettore)
+
+        // Child Process (reader)
         reader(sem_mutex, sem_empty, sem_full, shared_data);
+
     } else {
-        // Processo padre (scrittore)
-        SYSC(retvalue, fork(), "nella fork");
+        
+        // Father Process
+
+        // Create Child process
+        SYSC(retvalue, fork(), "fork error");
+        
         if (!retvalue) {
+
+            // Child Process (writer)
             writer(sem_mutex, sem_empty, sem_full, shared_data);
         }
     }
 
-    // Attesa dei processi figli
-    SYSC(retvalue, wait(NULL), "nella wait");
+    // Wait Child processes
+    SYSC(retvalue, wait(NULL), "wait error");
 
-    // Chiusura delle risorse
-    SYSC(retvalue, munmap(shared_data, sizeof(SharedData)), "nella munmap");
-    SYSC(retvalue, close(shm_fd), "nella close");
+    // Close resources
+    SYSC(retvalue, munmap(shared_data, sizeof(SharedData)), "munmap error");
+    SYSC(retvalue, close(shm_fd), "close error");
 
-    SYSC(retvalue, sem_close(sem_mutex), "nella sem_close");
-    SYSC(retvalue, sem_close(sem_empty), "nella sem_close");
-    SYSC(retvalue, sem_close(sem_full), "nella sem_close");
+    SYSC(retvalue, sem_close(sem_mutex), "sem_close error");
+    SYSC(retvalue, sem_close(sem_empty), "sem_close error");
+    SYSC(retvalue, sem_close(sem_full), "sem_close error");
 
-    SYSC(retvalue, sem_unlink(SEM_MUTEX_NAME), "nella sem_unlink");
-    SYSC(retvalue, sem_unlink(SEM_EMPTY_NAME), "nella sem_unlink");
-    SYSC(retvalue, sem_unlink(SEM_FULL_NAME), "nella sem_unlink");
+    SYSC(retvalue, sem_unlink(SEM_MUTEX_NAME), "sem_unlink error");
+    SYSC(retvalue, sem_unlink(SEM_EMPTY_NAME), "sem_unlink error");
+    SYSC(retvalue, sem_unlink(SEM_FULL_NAME), "sem_unlink error");
 
-    SYSC(retvalue, shm_unlink(SHARED_MEM_NAME), "nella shm_unlink");
+    SYSC(retvalue, shm_unlink(SHARED_MEM_NAME), "shm_unlink error");
 
     return 0;
 }
 
 void reader(sem_t *sem_mutex, sem_t *sem_empty, sem_t *sem_full, SharedData *shared_data) {
+
     char data;
     int retvalue;
 
     while (1) {
-        // Attendi che ci siano dati disponibili nel buffer
-        SYSC(retvalue, sem_wait(sem_empty), "nella sem_wait");
-        // Proteggi l'accesso al buffer
-        SYSC(retvalue, sem_wait(sem_mutex), "nella sem_wait");
+        
+        // Wait data
+        SYSC(retvalue, sem_wait(sem_empty), "sem_wait error");
+       
+        // Mutex lock
+        SYSC(retvalue, sem_wait(sem_mutex), "sem_wait error");
 
-        // Leggi dal buffer
+        // Read from buffer
         data = shared_data->buffer[shared_data->read_index];
         shared_data->read_index = (shared_data->read_index + 1) % BUFFER_SIZE;
 
-        // Rilascia la protezione del buffer
-        SYSC(retvalue, sem_post(sem_mutex), "nella sem_post");
-        // Incrementa il numero di spazi vuoti nel buffer
-        SYSC(retvalue, sem_post(sem_full), "nella sem_post");
+        // Mutex unlock
+        SYSC(retvalue, sem_post(sem_mutex), "sem_post error");
 
-        // Utilizza il dato letto (in questo caso, stampa a schermo)
+        // Increment data on buffer full counter
+        SYSC(retvalue, sem_post(sem_full), "sem_post error");
+
+        // Write read data on stdout
         printf("Reader - Read: %c\n", data);
 
         if(data == 'Z') exit(EXIT_SUCCESS);
 
-        // Simula un tempo di elaborazione
+        // Simulate elaboration time
         usleep(100000);
     }
+
 }
 
 void writer(sem_t *sem_mutex, sem_t *sem_empty, sem_t *sem_full, SharedData *shared_data) {
+
     char data = 'A';
     int retvalue;
 
     while (1) {
-        // Attendi che ci siano spazi vuoti nel buffer
-        SYSC(retvalue, sem_wait(sem_full), "nella sem_wait");
-        // Proteggi l'accesso al buffer
-        SYSC(retvalue, sem_wait(sem_mutex), "nella sem_wait");
+        
+        // Wait free slots
+        SYSC(retvalue, sem_wait(sem_full), "sem_wait error");
+        
+        // Mutex lock
+        SYSC(retvalue, sem_wait(sem_mutex), "sem_wait error");
 
-        // Scrivi nel buffer
+        // Write on buffer
         shared_data->buffer[shared_data->write_index] = data;
         shared_data->write_index = (shared_data->write_index + 1) % BUFFER_SIZE;
 
-        // Rilascia la protezione del buffer
-        SYSC(retvalue, sem_post(sem_mutex), "nella sem_post");
-        // Incrementa il numero di dati disponibili nel buffer
-        SYSC(retvalue, sem_post(sem_empty), "nella sem_post");
+        // Mutex unlock
+        SYSC(retvalue, sem_post(sem_mutex), "sem_post error");
+        
+        // Increment data on buffer empty counter
+        SYSC(retvalue, sem_post(sem_empty), "sem_post error");
 
-        // Utilizza il dato scritto (in questo caso, stampa a schermo)
+        // Write wrote data on stdout
         printf("Writer - Wrote: %c\n", data);
 
-        // Incrementa il carattere da scrivere (esempio: A, B, C, ...)
+        // Change char
         if(data == 'Z') exit(EXIT_SUCCESS);
         data = data + 1;
 
-        // Simula un tempo di elaborazione
+        // Simulate elaboration time
         usleep(150000);
     }
 }

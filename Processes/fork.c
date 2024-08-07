@@ -10,33 +10,38 @@
 int main() {
     pid_t pid;
 
-    // Creazione di un nuovo processo
-    SYSC(pid, fork(), "nella fork");
+    // Create Child process
+    SYSC(pid, fork(), "fork error");
 
     if (pid == 0) {
-        // Codice eseguito dal processo figlio
-        printf("Sono il processo figlio, PID: %d\n", getpid());
+       
+       // Child process
 
-        // Terminazione del processo figlio
+        printf("I'm the Child process, PID: %d\n", getpid());
+
+        // Exit from child process
         exit(EXIT_SUCCESS);
 
     } else {
-        // Codice eseguito dal processo padre
-        printf("Sono il processo padre, PID: %d\n", getpid());
 
-        // Attesa della terminazione del processo figlio
+        // Father Process
+
+        printf("I'm the Father process, PID: %d\n", getpid());
+
+        // Wait Child Process
         int status;
         pid_t child_pid;
-        SYSC(child_pid, wait(&status), "nella wait");
+        SYSC(child_pid, wait(&status), "wait error");
+
 
         if (WIFEXITED(status)) {
-            printf("Il processo figlio con PID %d che avevo creato come %d è terminato con stato %d\n",
-                   child_pid, pid, WEXITSTATUS(status));
+            printf("Child process exited with code: %d\n", WEXITSTATUS(status));
         } else {
-            printf("Il processo figlio con PID %d non è terminato correttamente\n", child_pid);
+            printf("Child process exit error \n");
         }
 
-        // Terminazione del processo padre
+        // Exit from father process
         exit(EXIT_SUCCESS);
+        
     }
 }

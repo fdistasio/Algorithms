@@ -16,46 +16,49 @@ int main() {
     pid_t pid;
     char buffer[BUFFER_SIZE];
 
-    // Creazione della pipe
-    SYSC(retvalue, pipe(pipe_fd), "nella pipe");
+    // Create Pipe
+    SYSC(retvalue, pipe(pipe_fd), "pipe error");
 
-    // Creazione di un nuovo processo figlio
-    SYSC(pid, fork(), "nella fork");
+    // Create child process
+    SYSC(pid, fork(), "fork error");
 
     if (pid == 0) { 
-        // Codice del processo figlio
+        
+        // Child Process
 
-        // Chiusura pipe in scrittura
-        SYSC(retvalue, close(pipe_fd[1]), "nella close");
+        // Close pipe file descriptor (write)
+        SYSC(retvalue, close(pipe_fd[1]), "close error");
 
-        // Lettura dalla pipe
+        // Read from pipe
         ssize_t n_read, n_written;
-        SYSC(n_read, read(pipe_fd[0], buffer, BUFFER_SIZE), "nella read");
+        SYSC(n_read, read(pipe_fd[0], buffer, BUFFER_SIZE), "read error");
 
-        // Scrittura dei dati ricevuti
-        SYSC(n_written, write(STDOUT_FILENO, buffer, n_read), "nella write");
+        // Write on pipe
+        SYSC(n_written, write(STDOUT_FILENO, buffer, n_read), "write error");
 
-        // Chiusura pipe in lettura
-        SYSC(retvalue, close(pipe_fd[0]), "nella close");
+        // Close pipe file descriptor (read)
+        SYSC(retvalue, close(pipe_fd[0]), "close error");
 
         exit(EXIT_SUCCESS);
 
     } else { 
-        // Codice del processo padre
+        
+        // Father Process
 
-        // Chiusura pipe in lettura
-        SYSC(retvalue, close(pipe_fd[0]), "nella close");
+        // Close pipe file descriptor (read)
+        SYSC(retvalue, close(pipe_fd[0]), "close error");
 
-        // Scrittura dei dati sulla pipe
+        // Write on pipe
         ssize_t n_written;
-        const char *data_to_send = "Ciao, caro processo figlio!";
-        SYSC(n_written, write(pipe_fd[1], data_to_send, strlen(data_to_send)), "nella write");
+        const char *data_to_send = "Hello child process!";
+        SYSC(n_written, write(pipe_fd[1], data_to_send, strlen(data_to_send)), "write error");
 
-        // Chiusura pipe in scrittura
+        // Close pipe file descriptor (write)
         SYSC(retvalue, close(pipe_fd[1]), "nella close");
 
         pid_t pid_c;
-        // Attesa della terminazione del processo figlio
+
+        // Wait child process
         SYSC(pid_c, waitpid(pid, NULL, 0), "nella waitpid");
     }
 

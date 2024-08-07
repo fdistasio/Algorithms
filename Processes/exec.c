@@ -9,33 +9,35 @@
 // fork(), exec(), waitpid()
 
 int main() {
+
     pid_t pid;
     int retvalue;
-    SYSC(pid, fork(), "nella fork");
+    SYSC(pid, fork(), "fork error");
 
     if (pid == 0) {
-        // Codice del processo figlio
+        // Child Process
 
-        // Utilizzo di exec per eseguire un nuovo programma
+        // Exec ls -l
         char *args[] = {"ls", "-l", NULL};
-        SYSC(retvalue, execvp("ls", args), "nella exec");
+        execvp("ls", args);
 
-        // Se l'esecuzione di exec fallisce
+        // Exec error
         perror("exec");
         return 1;
 
     } else {
-        // Codice del processo padre
 
-        // Attesa della terminazione del processo figlio
+        // Father Process
+
+        // Wait Child Process
         int status;
         pid_t child_pid;
-        SYSC(child_pid, waitpid(pid, &status, 0), "nella waitpid");
+        SYSC(child_pid, waitpid(pid, &status, 0), "waitpid error");
 
         if (WIFEXITED(status)) {
-            printf("Il processo figlio è terminato con codice di uscita: %d\n", WEXITSTATUS(status));
+            printf("Child process exited with code: %d\n", WEXITSTATUS(status));
         } else {
-            printf("Il processo figlio non è terminato correttamente\n");
+            printf("Child process exit error \n");
         }
     }
 
