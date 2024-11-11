@@ -31,7 +31,7 @@ typedef struct n{
 
 typedef StackNode* Stack;
 
-//O(1)
+
 void push(Stack* s, int n){
 	StackNode* node=(StackNode*)malloc(sizeof(StackNode));
 	if(node==NULL) exit(1);
@@ -40,7 +40,7 @@ void push(Stack* s, int n){
 	*s=node;
 }
 
-//O(1)
+
 int pop(Stack* s){
 	if(*s==NULL)
 		return -1;
@@ -51,7 +51,7 @@ int pop(Stack* s){
 	return res;
 }
 
-//O(1)
+
 void insert(Edge** adjList,int dest,float weight){
 	Edge* e=(Edge*)malloc(sizeof(Edge));
 	e->dest=dest;
@@ -60,7 +60,7 @@ void insert(Edge** adjList,int dest,float weight){
 	*adjList=e;
 }
 
-//O(N)
+
 Graph load(char* file){
 	FILE* in = fopen(file,"r");
 	if(in){
@@ -90,7 +90,7 @@ Graph load(char* file){
 	}
 }
 
-//O(N+E)
+
 void save(Graph g, char* file){
 	FILE* out = fopen(file,"w");
 	if(out){
@@ -114,14 +114,14 @@ void save(Graph g, char* file){
 	}
 }
 
-//O(1)
+
 void visit(int n,int p,int* visited, int* result, int* visitedN){
 	visited[n]=p;
 	result[*visitedN]=n;
 	*visitedN=*visitedN+1;
 }
 
-//O(N+E)
+
 Graph bfs(Graph g, int start, int* nConComp){
 	Graph result_forest = create_graph(g.N);
 	int parent[g.N]; 
@@ -164,7 +164,7 @@ Graph bfs(Graph g, int start, int* nConComp){
 	return result_forest;
 }
 
-//O(N+E)
+
 int* dfs(Graph g, int start, int* hasCycles, int* nConComp){
 	int prev[g.N];
 	
@@ -211,7 +211,7 @@ int* dfs(Graph g, int start, int* hasCycles, int* nConComp){
 	return result;
 }
 
-//O(N+E)
+
 int hasCycles(Graph g){
 	int cycles;
 	int* temp=dfs(g,0,&cycles,NULL);
@@ -219,7 +219,7 @@ int hasCycles(Graph g){
 	return cycles;
 }
 
-//O(N+E)
+
 int countConnectedComponents(Graph g){
 	int ncc;
 	int* temp=dfs(g,0,NULL,&ncc);
@@ -227,7 +227,7 @@ int countConnectedComponents(Graph g){
 	return ncc;
 }
 
-//O(N+E)
+
 int isTree(Graph g){
 	int cycles,ncc;
 	int* temp=dfs(g,0,&cycles,&ncc);
@@ -235,13 +235,13 @@ int isTree(Graph g){
 	return (ncc==1 && !cycles);
 }
 
-//O(1)
+
 void insertEdge(Graph g, CompleteEdge e){
 	insert(&(g.nodes[e.n1].adjList), e.n2,e.w);
 	insert(&(g.nodes[e.n2].adjList), e.n1,e.w);
 }
 
-//O(E)
+
 void _remove(Edge** adjList, int n){
 	if((*adjList)!=NULL){
 		if((*adjList)->dest==n){
@@ -255,18 +255,18 @@ void _remove(Edge** adjList, int n){
 	}
 }
 
-//O(E)
+
 void removeEdge(Graph g, CompleteEdge e){
 	_remove(&(g.nodes[e.n1].adjList),e.n2);
 	_remove(&(g.nodes[e.n2].adjList),e.n1);	
 }
 
-//O(1)
+
 int compareEdge(const void* e1,const void* e2){
 	return (int)((CompleteEdge*)e1)->w-((CompleteEdge*)e2)->w;
 }
 
-//O(ElogE)
+
 Graph Kruskal(Graph g){
 	Graph tree;
 	tree.N=g.N;
@@ -314,7 +314,7 @@ Graph Kruskal(Graph g){
 	return tree;	
 }
 
-//O(N+ElogN)
+
 Graph Dijkstra(Graph g, int source, int orientato){
 	Graph result_ssp = create_graph(g.N);
 

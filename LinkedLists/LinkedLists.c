@@ -1,13 +1,13 @@
 //Linked Lists functions
 #include <stdlib.h>
 
-typedef struct n{
+typedef struct n {
     int data;
     struct n * next;
-}Node;
+} Node;
 
 //O(1)
-void headInsert(Node** head,int data){
+void headInsert(Node** head,int data) {
     Node *newNode = (Node*)malloc(sizeof(Node*));
     if(newNode == NULL) exit(1);
     newNode->data = data;
@@ -18,7 +18,7 @@ void headInsert(Node** head,int data){
 }
 
 //O(n)
-void sortedInsert(Node** head,int data){
+void sortedInsert(Node** head,int data) {
     Node *newNode = (Node*)malloc(sizeof(Node*));
     if(newNode == NULL) exit(1);
     newNode->data = data;
@@ -27,43 +27,43 @@ void sortedInsert(Node** head,int data){
     Node *prevPtr = NULL;
     Node *currPtr = *head;
 
-    while(currPtr != NULL && data > currPtr->data){
+    while(currPtr != NULL && data > currPtr->data) {
         prevPtr = currPtr;
         currPtr = currPtr->next;
     }
 
-    if(prevPtr == NULL){
+    if(prevPtr == NULL) {
         newNode->next = *head;
         *head = newNode;
     }
-    else{
+    else {
         prevPtr->next = newNode;
         newNode->next = currPtr;
     }
 }
 
 //O(n)
-void deleteData(Node** head, int data){
+void deleteData(Node** head, int data) {
     if(*head == NULL) return;
     
     Node *prevPtr = NULL;
     Node *currPtr = *head;
 
-    while(currPtr != NULL){
-        if(currPtr->data == data){
+    while(currPtr != NULL) {
+        if(currPtr->data == data) {
             Node *tempPtr = currPtr;
             
-            if(prevPtr != NULL){
+            if(prevPtr != NULL) {
                 prevPtr->next = currPtr->next;
             }
-            else{
+            else {
                 *head = currPtr->next;
             }
             
             currPtr = currPtr->next;
             free(tempPtr);
         }
-        else{
+        else {
             prevPtr = currPtr;
             currPtr = currPtr->next;
         }
@@ -72,24 +72,25 @@ void deleteData(Node** head, int data){
 }
 
 //O(n)
-void printL(Node* head){
+void printL(Node* head) {
     Node *currPtr = head;
-    while(currPtr != NULL){
+
+    while(currPtr != NULL) {
         printf("%d ",currPtr->data);
         currPtr = currPtr->next;
     }
 }
 
 //O(n)
-void sortedInsertRec(Node** head, int data){
-    if(*head == NULL){
+void sortedInsertRec(Node** head, int data) {
+    if(*head == NULL) {
         Node *newNode = (Node*)malloc(sizeof(Node*));
         if(newNode == NULL) exit(1);
         newNode->data = data;
         newNode->next = NULL;
         *head = newNode;
     }
-    else if((*head)->data > data){
+    else if((*head)->data > data) {
         Node *newNode = (Node*)malloc(sizeof(Node*));
         if(newNode == NULL) exit(1);
         newNode->data = data;
@@ -102,9 +103,9 @@ void sortedInsertRec(Node** head, int data){
 }
 
 //O(n)
-void deleteDataRec(Node** head, int data){
+void deleteDataRec(Node** head, int data) {
     if(*head == NULL) return;
-    if((*head)->data == data){
+    if((*head)->data == data) {
         Node *tempPtr = *head;
         *head = tempPtr->next;
         free(tempPtr);
@@ -115,7 +116,7 @@ void deleteDataRec(Node** head, int data){
 }
 
 //O(n)
-void printLRec(Node* head){
+void printLRec(Node* head) {
     if(head == NULL) return;
     printf("%d",head->data);
     printLRec(head->next);

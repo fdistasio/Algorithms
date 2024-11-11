@@ -2,7 +2,7 @@
 
 #include <limits.h>
 
-void merge(int A[], int left, int mid, int right){
+void merge(int A[], int left, int mid, int right) {
     int n1 = mid - left + 1;
     int n2 = right - mid;
     int L[n1+1], R[n2+1];
@@ -16,7 +16,7 @@ void merge(int A[], int left, int mid, int right){
     R[n2] = INT_MAX;
 
     int i = 0, j = 0;
-    for(int k = left ; k <= right ; k++){
+    for(int k = left ; k <= right ; k++) {
         if(L[i] <= R[j]){
             A[k] = L[i];
             i++;
@@ -26,11 +26,10 @@ void merge(int A[], int left, int mid, int right){
             j++;
         }
     }
-
 }
 
-void mergeSort(int A[], int left , int right){
-    if(left < right){
+void mergeSort(int A[], int left , int right) {
+    if(left < right) {
         int mid = (left + right)/2;
         mergeSort(A,left,mid);
         mergeSort(A,mid+1,right);

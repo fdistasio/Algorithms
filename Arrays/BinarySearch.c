@@ -1,14 +1,13 @@
 //Binary Search O(logn)
 
-int binarySearch(int A[], int n, int k){
-    
+int binarySearch(int A[], int n, int k) {
     int i = -1;
     int left = 0;
     int right = n-1;
 
-    while(left <= right && i == -1){
+    while(left <= right && i == -1) {
         int mid = (left + right)/2;
-        if(A[mid] == k){
+        if(A[mid] == k) {
             i = mid;
             return i;
         }
