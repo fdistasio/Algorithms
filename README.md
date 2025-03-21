@@ -43,3 +43,17 @@ Set of algorithms and data structures, and more generic algorithms for recurring
 - [Thread Mutex](Threads/threadsCreateMutex.c)
 - [Thread Producer Consumer](Threads/threadsProducerConsumer.c)
 - [Error Handling macros](Threads/macros.h)
+
+## Linear Programming
+
+- [Primal Simplex](LinearProgramming/primal_simplex.m)
+- [Dual Simplex](LinearProgramming/dual_simplex.m)
+
+## Linear Algebra
+
+- [Lower Triangular Matrix Solver](LinearAlgebra/tri_low_solver.m)
+- [Upper Triangular Matrix Solver](LinearAlgebra/tri_up_solver.m)
+- [LU factorization with Gaussian Elimination](LinearAlgebra/gauss_lu.m)
+- [Gauss-Seidel](LinearAlgebra/my_gauss_seidel.m)
+- [Jacobi](LinearAlgebra/my_jacobi.m)
+- [Jacobi and Gauss-Seidel Solver](LinearAlgebra/j_gs_solver.m)
