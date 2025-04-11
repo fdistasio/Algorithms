@@ -57,3 +57,8 @@ Set of algorithms and data structures, and more generic algorithms for recurring
 - [Gauss-Seidel](LinearAlgebra/my_gauss_seidel.m)
 - [Jacobi](LinearAlgebra/my_jacobi.m)
 - [Jacobi and Gauss-Seidel Solver](LinearAlgebra/j_gs_solver.m)
+
+## Root Finding
+
+- [Fixed Point Method](RootFinding/fixed_point.m)
+- [Newton's Method](RootFinding/newton_method.m)
