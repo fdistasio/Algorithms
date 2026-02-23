@@ -1,5 +1,5 @@
 # Algorithms
-Set of algorithms and data structures, and more generic algorithms for recurring problems.
+Set of algorithms, data structures, and more generic patterns for recurring problems.
 
 ## Arrays
 
@@ -62,3 +62,8 @@ Set of algorithms and data structures, and more generic algorithms for recurring
 
 - [Fixed Point Method](RootFinding/fixed_point.m)
 - [Newton's Method](RootFinding/newton_method.m)
+
+## Parallel Programming
+
+- [Pipeline](ParallelProgramming/Pipeline)
+- [Workload Balancing](ParallelProgramming/WorkloadBalancing)
