@@ -67,3 +67,4 @@ Set of algorithms, data structures, and more generic patterns for recurring prob
 
 - [Pipeline](ParallelProgramming/Pipeline)
 - [Workload Balancing](ParallelProgramming/WorkloadBalancing)
+- [Parallel STL](ParallelProgramming/ParallelSTL)
